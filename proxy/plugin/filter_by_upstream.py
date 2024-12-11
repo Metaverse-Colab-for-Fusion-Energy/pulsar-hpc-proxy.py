@@ -22,7 +22,7 @@ flags.add_argument(
     '--filtered-upstream-hosts',
     type=str,
     default='facebook.com,www.facebook.com',
-    help='Default: Blocks Facebook.  Comma separated list of IPv4 and IPv6 addresses.',
+    help='Default: Blocks Facebook.  Comma separated list of fully qualified domain names, e.g. "facebook.com,www.facebook.com".',
 )
 
 
@@ -32,7 +32,7 @@ class FilterByUpstreamHostPlugin(HttpProxyBasePlugin):
     def before_upstream_connection(
             self, request: HttpParser,
     ) -> Optional[HttpParser]:
-        if text_(request.host) in self.flags.filtered_upstream_hosts.split(','):
+        if request.host.decode() in self.flags.filtered_upstream_hosts.split(','):
             raise HttpRequestRejected(
                 status_code=httpStatusCodes.I_AM_A_TEAPOT,
                 reason=b'I\'m a tea pot',
